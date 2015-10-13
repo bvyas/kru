@@ -1,0 +1,50 @@
+<div ng-controller="ProductsController">
+	
+	<h3>Add a new product</h3>
+<div class="product">
+  <p><input type="text" ng-model="filter_name" placeholder="filter"></p>
+	<form>
+     
+      <p> Name: <input type='text' value='' ng-model='new_product.name'></p>
+       <p>url: <input type='text' value='' ng-model='new_product.url'></p>
+       <p>Description: <input type='text' value='' ng-model='new_product.description'></p>
+       <p>Quantity: <select ng-model='new_product.quantity' 
+        class="ng-valid ng-dirty">
+          <option value="10">10</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="9">9</option>
+        </select></p>
+    	   <p><input type="hidden" ng-model = "new_product.date"></p>
+       	 <p><input type='submit' value='create' ng-click='addProduct()'></p>
+    </form>
+</div>
+
+<div class="show">
+	<ol>
+      <li ng-repeat="product in products | filter:filter_name | orderBy:'name'">
+          {{ product.name }}
+          ({{ product.quantity }})
+           <img ng-src='{{ product.url }}' >
+           {{ product.description }}
+           
+           {{ order.date | date: formate: longdate }}</li>
+      </ol> 
+    </div>
+
+<style type="text/css">
+.product, .show{
+	display: inline-block;;
+	vertical-align: top;
+}
+.product{
+	width: 300px;
+}
+.show{
+	width: 1000px;
+	display: inline-block;
+}
+.show li{
+	display: inline-block;
+}
+</style>

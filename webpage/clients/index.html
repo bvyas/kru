@@ -1,0 +1,171 @@
+<html ng-app="storeApp" >
+<head>
+	<title>Orders and Customers</title>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.5/angular.min.js"></script>
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+ <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.5/angular-route.min.js"></script>
+
+<script src="script.js"></script>
+<script type="text/javascript">
+storeApp.controller('CustomersController', function ($scope, CustomerFactory, OrderFactory){
+      
+      var d = new Date();
+      $scope.date_onsite = d.getTime();
+      CustomerFactory.getCustomers(function(res_fac){
+        $scope.customers = res_fac;
+      })
+      function updateCustomers(){
+          CustomerFactory.getCustomers(function(output){
+          $scope.customers = output;
+         });
+      }  
+         
+      $scope.addCustomer = function(){
+        CustomerFactory.addCustomer($scope.new_customer, function(data){
+          // $scope.customers = data;
+          // $scope.new_customer = {};
+        })
+        CustomerFactory.getCustomers(function(res_fac){
+          $scope.customers = res_fac;
+        })
+      }
+      $scope.removeCustomer = function(customer){
+        console.log(customer);
+         CustomerFactory.removeCustomer(customer, function(data){
+         // $scope.customers = data;
+        })
+         CustomerFactory.getCustomers(function(res_fac){
+           $scope.customers = res_fac;
+         })
+      }
+
+  });
+
+
+
+
+	storeApp.factory('CustomerFactory', function($http){
+	  var factory = {};
+	  var customers = [];
+	  factory.getCustomers = function(callback){
+	       $http.get('/customers').success(function(resdata){
+	         customers = resdata;
+	         callback(customers);
+	       })
+	  }
+	  factory.addCustomer = function(data, callback){
+	     $http.post('/customers', {name: data}).success(function(somedata){
+	       //customers.push({name:data.name, date:data.date})
+	       //callback(customers);
+	     })
+	  }
+	  factory.removeCustomer = function(data, callback){
+
+	    $http.post('/remove_customer', data).success(function(response)
+	    {
+
+	    })
+	  }
+	  return factory;
+	})
+
+
+
+
+	storeApp.controller('OrdersController', function ($scope, OrderFactory, CustomerFactory, ProductFactory){
+      
+      // function updateCustomers(){
+      //   CustomerFactory.getCustomers(function(output){
+      //     $scope.customers = output;
+      //   });
+      // }  
+      OrderFactory.getOrders(function(res_fac){
+        $scope.orders = res_fac;
+        console.log(res_fac)
+      })   
+      CustomerFactory.getCustomers(function(res_fac){
+        $scope.customers = res_fac;
+      })
+      ProductFactory.getProducts(function(res_fac){
+        console.log('getting this from factory', res_fac);
+        $scope.products = res_fac;
+      })
+      $scope.addOrder = function(){
+        OrderFactory.addOrder($scope.new_order, function(data){
+          $scope.orders = data;
+          $scope.new_order = {};
+          OrderFactory.getOrders(function(res_fac){
+            $scope.orders = res_fac;
+            console.log(res_fac)
+          })
+        })
+      }
+        });
+
+	storeApp.factory('OrderFactory', function($http){
+  var factory = {};
+  var orders = [];
+  factory.getOrders = function(callback){
+       $http.get('/orders').success(function(resdata){
+        console.log('factory', resdata)
+         orders = resdata;
+         callback(orders);
+       })
+  }
+  factory.addOrder = function(data, callback){
+     $http.post('/orders', {name: data.name, product: data.product, flag: data.flag}).success(function(somedata){
+       //customers.push({name:data.name, date:data.date})
+       callback();
+     })
+  }
+   return factory;
+})
+
+
+
+storeApp.controller('ProductsController', function ($scope, ProductFactory, OrderFactory){    
+      $scope.addProduct = function(){
+        ProductFactory.addProduct($scope.new_product, function(data){
+          $scope.products = data;
+          $scope.new_product = {};
+        })
+      }
+
+      ProductFactory.getProducts(function(res_fac){
+        console.log('getting this from factory', res_fac);
+        $scope.products = res_fac;
+      })
+});
+
+  storeApp.factory('ProductFactory', function($http){
+    var factory = {};
+    var Products = [];
+    factory.getProducts = function(callback){
+         $http.get('/products').success(function(resdata){
+           products = resdata;
+           callback(products);
+         })
+    }
+    factory.addProduct = function(data, callback){
+       $http.post('/products', {name: data.name, url: data.url, description: data.description, quantity: data.quantity}).success(function(somedata){
+         //customers.push({name:data.name, date:data.date})
+         callback();
+       })
+    }
+    return factory;
+  })
+
+</script>
+
+
+</head>
+ <body>
+   <div >
+        <a href="#/">Customers</a> | <a href="#/Orders">Orders</a> | <a href="#/Products">Products</a>        
+        <div ng-view="">
+        </div>
+    </div>
+ 
+  
+</body>
+</html>
